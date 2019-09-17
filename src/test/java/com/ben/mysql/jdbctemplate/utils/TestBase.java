@@ -1,0 +1,19 @@
+package com.ben.mysql.jdbctemplate.utils;
+
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+/**
+ * 测试基类 <br>
+ *
+ * @author: Benjamin <br>
+ * @date: 2019/9/11 <br>
+ */
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"classpath:applicationContext.xml"})
+public abstract class TestBase {
+
+
+}

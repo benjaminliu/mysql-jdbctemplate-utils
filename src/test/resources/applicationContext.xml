@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!-- 本配置为样例配置-->
+
+    <context:component-scan base-package="com.ben.mysql.jdbctemplate.utils"/>
+
+
+    <!-- DB start-->
+
+    <!--dynamic-->
+    <bean id="testDataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+        <!--<property name="driverClassName" value="com.mysql.jdbc.Driver"/>-->
+        <property name="jdbcUrl"
+                  value="jdbc:mysql://localhost:3306/test?useUnicode=true&amp;characterEncoding=UTF-8&amp;zeroDateTimeBehavior=convertToNull"/>
+        <property name="username" value="test"/>
+        <property name="password" value="test"/>
+        <!-- 等待连接池分配连接的最大时长（毫秒），超过这个时长还没可用的连接则发生SQLException， 缺省:30秒 -->
+        <property name="connectionTimeout" value="10000"/>
+        <!-- 一个连接idle状态的最大时长（毫秒），超时则被释放（retired），缺省:10分钟 -->
+        <property name="idleTimeout" value="120000"/>
+        <!-- 连接池中允许的最小连接数，缺省值 maximumPoolSize-->
+        <property name="minimumIdle" value="2"></property>
+        <!-- 连接池中允许的最大连接数。缺省值：10；推荐的公式：((core_count * 2) + effective_spindle_count) -->
+        <property name="maximumPoolSize" value="4"/>
+        <!-- 线程池名-->
+        <property name="poolName" value="hikari"/>
+        <!-- 一个连接的生命时长（毫秒），超时而且没被使用则被释放（retired），缺省:30分钟，建议设置比数据库超时时长少30秒，参考MySQL wait_timeout参数（show variables like '%timeout%';） -->
+        <property name="maxLifetime" value="240000"/>
+        <property name="dataSourceProperties">
+            <props>
+                <prop key="useSSL">false</prop>
+                <prop key="rewriteBatchedStatements">true</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- DB end-->
+
+</beans>
