@@ -39,6 +39,45 @@ public abstract class SqlUtil {
     }
 
     /**
+     * 生成select语句，其中包含一个where条件，就是 key=value
+     **/
+    public static Pair<StringBuilder, List<Object>> selectWithSingleWhere(String table, String key, Object value, String... columns) {
+        if (StringUtils.isBlank(key))
+            return null;
+
+        if (value == null)
+            return null;
+
+        StringBuilder sql = selectWithoutWhere(table, columns);
+        if (sql == null)
+            return null;
+
+        sql.append(" where ");
+        sql.append(key);
+        sql.append("=?");
+        List<Object> args = new ArrayList<>();
+        args.add(value);
+
+        return Pair.of(sql, args);
+    }
+
+    /**
+     * 生成select语句，自动添加where关键字， 并添加用户自己定制的where语句（不含关键字）， where语句中可以包含 ？ 但是用户需要自己在本方法外提供相应的参数值
+     **/
+    public static StringBuilder selectWithWhereNoParams(String table, String whereWithoutKeyword, String... columns) {
+        StringBuilder sql = selectWithoutWhere(table, columns);
+        if (sql == null)
+            return null;
+
+        if (StringUtils.isBlank(whereWithoutKeyword))
+            return sql;
+
+        sql.append(" where ");
+        sql.append(whereWithoutKeyword);
+        return sql;
+    }
+
+    /**
      * 根据传入的值是否为空来拼接insert语句，并添加相应的参数.
      * onDuplicateKeyUpdate 可空，如果不为空，就是  ON DUPLICATE KEY UPDATE 关键字后面的需要的操作，如 statics=VALUES(statics),update_time=current_timestamp
      **/

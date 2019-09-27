@@ -29,6 +29,55 @@ public class SqlUtilTest extends TestBase {
         return "sys_log";
     }
 
+    private RowMapper<Pair<String, Integer>> groupByRowMapper = new RowMapper<Pair<String, Integer>>() {
+        @Override
+        public Pair<String, Integer> mapRow(ResultSet rs, int i) throws SQLException {
+            String userName = rs.getString("username");
+            int count = rs.getInt("cnt");
+            return Pair.of(userName, count);
+        }
+    };
+
+    @Test
+    public void test_selectWithoutWhere() {
+        StringBuilder sql = SqlUtil.selectWithoutWhere(getTableName(), "id", "user_id", "username", "operation", "time", "method");
+
+        Pair<StringBuilder, List<Object>> pair = new SqlWhereGroupByOrderByLimitBuilder(sql).
+                andGreaterThan("id", 1)
+                .andCustomized("username=? or username=?", "test", "test1")
+                .build();
+
+        List<SysLog> res = jdbcTemplate.query(pair.getLeft().toString(), pair.getRight().toArray(), sysLogRowMapper);
+
+        log.info("{}", res.size());
+    }
+
+    @Test
+    public void test_selectWithKey() {
+        Pair<StringBuilder, List<Object>> pair = SqlUtil.selectWithSingleWhere(getTableName(), "id", 1, "id", "user_id", "username", "operation", "time", "method");
+        if (pair != null) {
+            List<SysLog> res = jdbcTemplate.query(pair.getLeft().toString(), pair.getRight().toArray(), sysLogRowMapper);
+
+            log.info("{}", res.size());
+        }
+    }
+
+    @Test
+    public void test_selectWithWhereNoParams() {
+        StringBuilder sql = SqlUtil.selectWithWhereNoParams(getTableName(), "disabled=0", "id", "user_id", "username", "operation", "time", "method");
+        List<SysLog> res = jdbcTemplate.query(sql.toString(), sysLogRowMapper);
+
+        log.info("{}", res.size());
+    }
+
+    @Test
+    public void test_selectWithWhereNoParams_externalParams() {
+        StringBuilder sql = SqlUtil.selectWithWhereNoParams(getTableName(), "id=?", "id", "user_id", "username", "operation", "time", "method");
+
+        List<SysLog> res = jdbcTemplate.query(sql.toString(), new Object[]{1}, sysLogRowMapper);
+        log.info("{}", res.size());
+    }
+
     @Test
     public void insertSelective() {
 
@@ -73,27 +122,6 @@ public class SqlUtilTest extends TestBase {
         }
     };
 
-    private RowMapper<Pair<String, Integer>> groupByRowMapper = new RowMapper<Pair<String, Integer>>() {
-        @Override
-        public Pair<String, Integer> mapRow(ResultSet rs, int i) throws SQLException {
-            String userName = rs.getString("username");
-            int count = rs.getInt("cnt");
-            return Pair.of(userName, count);
-        }
-    };
-
-    @Test
-    public void test() {
-        StringBuilder sql = SqlUtil.selectWithoutWhere(getTableName(), "id", "user_id", "username", "operation", "time", "method");
-        Pair<StringBuilder, List<Object>> pair = new SqlWhereGroupByOrderByLimitBuilder(sql).
-                andGreaterThan("id", 1)
-                .andCustomized("username=? or username=?", "test", "test1")
-                .build();
-
-        List<SysLog> res = jdbcTemplate.query(pair.getLeft().toString(), pair.getRight().toArray(), sysLogRowMapper);
-
-        log.info("adf");
-    }
 
     @Test
     public void testGroupBy() {
